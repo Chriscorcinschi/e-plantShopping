@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./ProductList.css";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addItem } from "./cartSlice";
 import CartItem from "./CartItem";
 
@@ -10,6 +10,8 @@ function ProductList({ onHomeClick }) {
 	const [addedToCart, setAddedToCart] = useState({}); // variable management  which products are added to the cart.
 
 	const dispatch = useDispatch(); // Initialize dispatch
+	const cartItems = useSelector((state) => state.cart.items);
+	const totalCartItems = cartItems.reduce((total, item) => total + item.quantity, 0);
 
 	const plantsArray = [
 		{
@@ -318,6 +320,9 @@ function ProductList({ onHomeClick }) {
 										id="mainIconPathAttribute"
 									></path>
 								</svg>
+								{totalCartItems > 0 && (
+									<span className="cart_quantity_count">{totalCartItems}</span>
+								)}
 							</h1>
 						</a>
 					</div>
@@ -327,20 +332,24 @@ function ProductList({ onHomeClick }) {
 				<div className="product-grid">
 					{plantsArray.map((category, categoryIndex) => (
 						<div key={categoryIndex}>
-							<h2>{category.category}</h2>
+							<h1> {category.category}</h1>
+
 							<div className="product-list">
 								{category.plants.map((plant, plantIndex) => (
-									<div key={plantIndex} className="product-card">
+									<div className="product-card" key={plantIndex}>
 										<img src={plant.image} alt={plant.name} className="product-image" />
 										<div>
-											<h3 className="product-title">{plant.name}</h3>
+											<h2 className="product-title">{plant.name}</h2>
 											<p className="product-description">{plant.description}</p>
 											<div className="product-price">{plant.cost}</div>
 											<button
-												className="product-button"
+												className={`product-button ${
+													addedToCart[plant.name] ? "added-to-cart" : ""
+												}`}
 												onClick={() => handleAddToCart(plant)}
+												disabled={addedToCart[plant.name]}
 											>
-												Add to Cart
+												{addedToCart[plant.name] ? "Added to Cart" : "Add to Cart"}
 											</button>
 										</div>
 									</div>
