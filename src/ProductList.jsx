@@ -7,12 +7,14 @@ import CartItem from "./CartItem";
 function ProductList({ onHomeClick }) {
 	const [showCart, setShowCart] = useState(false);
 	const [showPlants, setShowPlants] = useState(false); // State to control the visibility of the About Us page
-	const [addedToCart, setAddedToCart] = useState({}); // variable management  which products are added to the cart.
 
 	const dispatch = useDispatch(); // Initialize dispatch
 	const cartItems = useSelector((state) => state.cart.items);
 	const totalCartItems = cartItems.reduce((total, item) => total + item.quantity, 0);
 
+	const isInCart = (productName) => {
+		return cartItems.some((item) => item.name === productName);
+	};
 	const plantsArray = [
 		{
 			category: "Air Purifying Plants",
@@ -264,12 +266,6 @@ function ProductList({ onHomeClick }) {
 
 	const handleAddToCart = (product) => {
 		dispatch(addItem(product)); // Dispatch the action to add the product to the cart (Redux action)
-
-		setAddedToCart((prevState) => ({
-			// Update the local state to reflect that the product has been added
-			...prevState, // Spread the previous state to retain existing entries
-			[product.name]: true, // Set the current product's name as a key with value 'true' to mark it as added
-		}));
 	};
 
 	return (
@@ -344,12 +340,12 @@ function ProductList({ onHomeClick }) {
 											<div className="product-price">{plant.cost}</div>
 											<button
 												className={`product-button ${
-													addedToCart[plant.name] ? "added-to-cart" : ""
+													isInCart(plant.name) ? "added-to-cart" : ""
 												}`}
 												onClick={() => handleAddToCart(plant)}
-												disabled={addedToCart[plant.name]}
+												disabled={isInCart(plant.name)}
 											>
-												{addedToCart[plant.name] ? "Added to Cart" : "Add to Cart"}
+												{isInCart(plant.name) ? "Added to Cart" : "Add to Cart"}
 											</button>
 										</div>
 									</div>
